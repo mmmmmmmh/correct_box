@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+ * {
+ user-select: none;
+ }
+
+  ul {
+ position: relative;
+  width: 300px;
+  height: auto;
+  margin: 0 auto;
+  padding: 100px;
+  }
+
+ li {
+  display: inline-block;
+ margin: 5px;
+  }
+
+  input {
+  width: 30px;
+ height: 30px;
+  }
+
+ #moveSelected {
+  position: fixed;
+  top: 0;
+  left: 0;
+ border: 1px dashed #2783F5;
+  pointer-events: none;
+            display:none;
+ }
+    </style>
+</head>
+<body>
+    <ul id="box">
+        <li id="moveSelected"></li>
+    </ul>
+    
+<script>
+    window.onload = function() {
+    let flag = false;
+    let oldLeft = 0; 
+    let oldTop = 0;
+    let box = document.getElementById('box') 
+    let moveSelected = document.getElementById("moveSelected");
+    for (let i = 0; i < 24; i++) {
+        let newLi = document.createElement("li");
+        newLi.innerHTML = '<input type="checkbox">';
+        box.append(newLi);
+    }
+    let checkboxs = box.getElementsByTagName("input"); 
+    box.onmousedown = function(e) {
+            flag = true;
+            moveSelected.style.top = e.pageY + 'px';
+            moveSelected.style.left = e.pageX + 'px';
+            oldLeft = e.pageX;
+            oldTop = e.pageY;
+            moveSelected.style.display = 'block'
+        }
+    box.onmousemove = function(e) {
+            if (!flag) return;
+            if (e.pageX < oldLeft) {
+                moveSelected.style.left = e.pageX + 'px';
+                moveSelected.style.width = (oldLeft - e.pageX) + 'px'; 
+            } else {
+                moveSelected.style.width = (e.pageX - oldLeft) + 'px';
+            }
+            if (e.pageY < oldTop) { 
+                moveSelected.style.top = e.pageY + 'px';
+                moveSelected.style.height = (oldTop - e.pageY) + 'px';
+            } else {
+                moveSelected.style.height = (e.pageY - oldTop) + 'px';
+            }
+            moveSelected.style.bottom = Number(moveSelected.style.top.split('px')[0]) + Number(moveSelected.style.height.split('px')[0]) + 'px';
+            moveSelected.style.right = Number(moveSelected.style.left.split('px')[0]) + Number(moveSelected.style.width.split('px')[0]) + 'px';
+            for (let i = 0; i < checkboxs.length; i++) {
+                let left = checkboxs[i].offsetLeft + box.offsetLeft;
+                let right = checkboxs[i].offsetWidth + left;
+                let top = checkboxs[i].offsetTop + box.offsetTop;
+                let bottom = checkboxs[i].offsetHeight + top;
+                let leftCover = moveSelected.style.left.split('px')[0] <= left && left <= moveSelected.style.right.split('px')[0];
+                let rightCover = moveSelected.style.left.split('px')[0] <= right && right <= moveSelected.style.right.split('px')[0];
+                let topCover = moveSelected.style.top.split('px')[0] <= top && top <= moveSelected.style.bottom.split('px')[0];
+                let bottomCover = moveSelected.style.top.split('px')[0] <= bottom && bottom <= moveSelected.style.bottom.split('px')[0];
+                if ((leftCover || rightCover) && (topCover || bottomCover)) {
+                    checkboxs[i].checked = true;
+                }
+            }
+        }
+    box.onmouseup = function(e) {
+            if (!flag) return;
+            flag = false;
+            moveSelected.style.width = 0;
+            moveSelected.style.height = 0;
+            moveSelected.style.top = 0;
+            moveSelected.style.left = 0;
+            moveSelected.style.bottom = 0;
+            moveSelected.style.right = 0;
+            moveSelected.style.display = 'none'
+        }
+    box.onmouseleave = function(e) {
+        flag = false;
+        moveSelected.style.width = 0;
+        moveSelected.style.height = 0;
+        moveSelected.style.top = 0;
+        moveSelected.style.left = 0;
+        moveSelected.style.bottom = 0;
+        moveSelected.style.right = 0;
+    }
+}
+
+
+</script>    
+</body>
+</html>
